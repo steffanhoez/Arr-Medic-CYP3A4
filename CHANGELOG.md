@@ -10,6 +10,26 @@ and this project adheres to \[Semantic Versioning](https://semver.org/).
 
 \## \[Unreleased]
 
+\### Added
+\- Automated installation scripts (`scripts/install.sh`, `scripts/install.bat`)
+\- Comprehensive installation guide (`docs/INSTALLATION.md`) with troubleshooting
+\- Enhanced requirements.txt with detailed RDKit installation guidance
+\- Interactive Jupyter notebook demo (`notebooks/demo_colab.ipynb`)
+\- GitHub issue templates for bug reports and feature requests
+\- Security middleware: GZip compression and TrustedHost validation
+\- Multiple installation pathways: Conda+RDKit (recommended), pip-only, Docker
+\- Cross-platform installation support (Windows/Linux/macOS)
+
+\### Changed
+\- Enhanced README with automated installer instructions and roadmap
+\- Updated disclaimer section with clinical usage warning
+\- Improved installation documentation with conda/pip options
+\- Enhanced requirements.txt with clear dependency categories and comments
+
+\### Fixed
+\- Removed `.pytest_cache/` from version control
+\- Improved dependency management for RDKit installation challenges
+
 
 
 \## \[1.0.0] - 2025-09-15
