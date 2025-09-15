@@ -133,9 +133,22 @@ please see commercial offerings. Migration toolkit (logs/DB transfer) will be pr
 
 ---
 
-## Example: Run in Google Colab
+## 🌐 Interactive Demo
 
-You can try the predictor interactively in a Jupyter/Colab notebook.
+### Try Online (Hugging Face Spaces)
+Experience the predictor directly in your browser - no installation required!
+
+🚀 **[Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/Flamehaven/arr-medic-cyp3a4-demo)**
+
+Features:
+- Interactive SMILES input with molecular visualization
+- Real-time CYP3A4 inhibition predictions
+- Educational examples and detailed results
+- Mobile-friendly interface
+
+### Run in Google Colab
+
+You can also try the predictor in a Jupyter/Colab notebook:
 
 ```python
 !pip install arr-medic-cyp3a4-opensource fastapi uvicorn

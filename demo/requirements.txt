@@ -1,0 +1,12 @@
+# Hugging Face Spaces Requirements for ARR-MEDIC CYP3A4 Demo
+gradio>=4.0.0
+numpy>=1.24
+pydantic>=1.10,<2
+python-dotenv>=1.0
+
+# For molecular visualization (will fallback gracefully if not available)
+rdkit-pypi>=2022.9.5
+Pillow>=8.0.0
+
+# Core prediction dependencies
+joblib>=1.3
