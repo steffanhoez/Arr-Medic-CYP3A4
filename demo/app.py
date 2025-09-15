@@ -1,6 +1,7 @@
 """
 ARR-MEDIC CYP3A4 Opensource - Multilingual Demo
 Korean-English language toggle with enhanced UI
+Auto-sync test - Updated via GitHub Actions
 """
 
 import gradio as gr
