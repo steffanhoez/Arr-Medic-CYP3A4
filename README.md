@@ -1,5 +1,13 @@
 # ARR-MEDIC CYP3A4 Opensource
 
+## ⚠️ Disclaimer
+
+🔴 **Not for Clinical or Diagnostic Use**
+This project is intended **only for research and educational purposes**.
+Do **not** use it in clinical decision-making, patient care, or regulatory submissions.
+
+---
+
 🧬 **Open Source CYP3A4 Drug Interaction Prediction System**
 
 > MIT License | For Academic Research and Learning
@@ -29,6 +37,8 @@ curl http://localhost:8000/health
 ```
 
 ### Option 2: Local Development
+
+#### Install with pip (simplified)
 ```bash
 # Clone repository
 git clone https://github.com/your-org/arr-medic-cyp3a4-opensource
@@ -46,6 +56,28 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 # Documentation at http://localhost:8000/docs
 ```
 
+#### Install with conda (recommended for RDKit)
+```bash
+# Clone repository
+git clone https://github.com/your-org/arr-medic-cyp3a4-opensource
+cd arr-medic-cyp3a4-opensource
+
+# Create conda environment
+conda create -n arr-medic python=3.10
+conda activate arr-medic
+
+# Install RDKit via conda (recommended)
+conda install -c conda-forge rdkit
+
+# Install remaining dependencies
+cd backend
+pip install -r requirements.txt
+cp .env.example .env
+
+# Start API server
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
 ## 🏗️ Architecture
 
 ```
@@ -60,6 +92,28 @@ arr-medic-cyp3a4-opensource/
 
 ⚠️ **Disclaimer**: This project is for **research and educational purposes only**.
 It is **not intended for clinical or diagnostic use**.
+
+## Roadmap
+- v1.0: Rule-based baseline (~70% accuracy)
+- v2.0: Add RDKit descriptors + ML (RandomForest, XGBoost)
+- v3.0: GNN / Transformer support
+
+For advanced **clinical-grade Pro version (90%+ accuracy, Flamehaven)**,
+please see commercial offerings. Migration toolkit (logs/DB transfer) will be provided.
+
+---
+
+## Example: Run in Google Colab
+
+You can try the predictor interactively in a Jupyter/Colab notebook.
+
+```python
+!pip install arr-medic-cyp3a4-opensource fastapi uvicorn
+
+from predictor import predict
+
+print(predict("CCN"))  # simple demo
+```
 
 ## 🔬 Features
 

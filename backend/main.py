@@ -8,6 +8,8 @@ MIT License - Educational purposes only.
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 import uvicorn
 import logging
 from typing import List, Dict, Any
@@ -41,6 +43,10 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Security middleware
+app.add_middleware(GZipMiddleware, minimum_size=1024)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "your-domain.com"])
 
 # CORS middleware with environment-based origins
 app.add_middleware(
