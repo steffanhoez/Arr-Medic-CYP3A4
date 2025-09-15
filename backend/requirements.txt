@@ -1,10 +1,42 @@
+# ARR-MEDIC CYP3A4 Opensource Dependencies
+# =====================================
+
+# Core API framework
 fastapi>=0.111
 uvicorn[standard]>=0.30
 pydantic>=1.10,<2
+
+# Database
 aiosqlite>=0.19
-# rdkit-pypi>=2022.9.5  # Install via conda: conda install -c conda-forge rdkit
+
+# Scientific computing
 numpy>=1.24
 joblib>=1.3
+
+# Configuration
 python-dotenv>=1.0
+
+# Testing
 pytest>=7.0
-httpx>=0.24.0  # For testing
+httpx>=0.24.0
+
+# RDKit (Critical for molecular descriptors)
+# ==========================================
+# IMPORTANT: RDKit should be installed via conda for best compatibility:
+#   conda install -c conda-forge rdkit
+#
+# Alternative pip installation (may have compatibility issues):
+#   pip install rdkit-pypi>=2022.9.5
+#
+# If RDKit is not available, the predictor will fall back to simplified
+# string-based molecular descriptors with reduced accuracy.
+#
+# Uncomment the line below ONLY if you can't use conda:
+# rdkit-pypi>=2022.9.5
+
+# Optional dependencies for enhanced functionality
+# ===============================================
+# scikit-learn>=1.3.0      # For future ML models
+# pandas>=1.5.0            # For data processing
+# matplotlib>=3.6.0        # For visualization
+# seaborn>=0.11.0          # For enhanced plots

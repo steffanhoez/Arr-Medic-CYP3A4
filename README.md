@@ -23,7 +23,37 @@ ARR-MEDIC CYP3A4 Opensource is a simplified, community-driven version of the CYP
 
 ## ⚡ Quick Start
 
-### Option 1: Docker (Recommended)
+### 🚀 Automated Installation (Recommended)
+
+#### Linux/macOS
+```bash
+# Clone repository
+git clone https://github.com/your-org/arr-medic-cyp3a4-opensource
+cd arr-medic-cyp3a4-opensource
+
+# Run automated installer
+chmod +x scripts/install.sh
+./scripts/install.sh
+```
+
+#### Windows
+```cmd
+# Clone repository
+git clone https://github.com/your-org/arr-medic-cyp3a4-opensource
+cd arr-medic-cyp3a4-opensource
+
+# Run automated installer
+scripts\install.bat
+```
+
+The installer will guide you through:
+- **Conda + RDKit** (best accuracy)
+- **pip only** (simplified mode)
+- **Docker** (containerized)
+
+📖 **Detailed Guide**: See [INSTALLATION.md](docs/INSTALLATION.md) for troubleshooting
+
+### Option 1: Docker (Easy Deployment)
 ```bash
 # Clone repository
 git clone https://github.com/your-org/arr-medic-cyp3a4-opensource
