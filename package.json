@@ -1,0 +1,79 @@
+{
+  "name": "arr-medic-cyp3a4-opensource",
+  "version": "1.0.0",
+  "description": "Open source CYP3A4 drug interaction prediction system for academic research",
+  "keywords": ["cyp3a4", "drug-interaction", "machine-learning", "bioinformatics", "opensource"],
+  "author": "ARR-MEDIC Community",
+  "license": "MIT",
+  "homepage": "https://github.com/arr-medic/cyp3a4-opensource",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arr-medic/cyp3a4-opensource.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arr-medic/cyp3a4-opensource/issues"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "start": "npm run backend:start",
+    "backend:dev": "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:start": "cd backend && uvicorn main:app --host 0.0.0.0 --port 8000",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:start": "cd frontend && npm run start",
+    "build": "npm run frontend:build",
+    "test": "npm run backend:test && npm run frontend:test",
+    "backend:test": "cd backend && python -m pytest tests/ -v",
+    "frontend:test": "cd frontend && npm test",
+    "lint": "npm run backend:lint && npm run frontend:lint",
+    "backend:lint": "cd backend && flake8 . --max-line-length=100",
+    "frontend:lint": "cd frontend && eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "install:all": "npm install && cd frontend && npm install",
+    "clean": "rm -rf node_modules frontend/node_modules backend/__pycache__ backend/.pytest_cache",
+    "docs:build": "cd docs && make html",
+    "docs:serve": "cd docs/_build/html && python -m http.server 8080"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0",
+    "python": ">=3.8.0"
+  },
+  "directories": {
+    "lib": "backend/",
+    "test": "tests/",
+    "doc": "docs/"
+  },
+  "files": [
+    "backend/",
+    "frontend/",
+    "docker-compose.yml",
+    "Dockerfile",
+    "README.md",
+    "LICENSE",
+    "requirements.txt"
+  ],
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/arr-medic"
+  },
+  "contributors": [
+    {
+      "name": "ARR-MEDIC Team",
+      "email": "opensource@arr-medic.com",
+      "url": "https://arr-medic.com"
+    }
+  ],
+  "config": {
+    "api_port": 8000,
+    "frontend_port": 3000,
+    "redis_port": 6379
+  }
+}
