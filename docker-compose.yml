@@ -39,6 +39,27 @@ services:
       - arr-backend
     restart: unless-stopped
 
+  # Gradio Multilingual Demo Interface
+  arr-demo:
+    build:
+      context: ./demo
+      dockerfile: Dockerfile
+    container_name: arr-demo-multilingual
+    ports:
+      - "7860:7860"
+    environment:
+      - ENV=demo
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+    depends_on:
+      - arr-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Redis Cache (Optional)
   redis:
     image: redis:7-alpine

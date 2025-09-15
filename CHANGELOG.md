@@ -8,7 +8,38 @@ and this project adheres to \[Semantic Versioning](https://semver.org/).
 
 
 
-\## \[Unreleased]
+\## \[1.1.0] - 2025-09-15
+
+\### Added 🌐
+\*\*Multilingual Interface Support\*\*
+\- \*\*Korean-English Language Toggle\*\* - Real-time interface switching in Gradio demo
+\- \*\*Complete UI Translation\*\* - All labels, buttons, messages, and results support both languages
+\- \*\*Localized Prediction Results\*\* - Molecular descriptors and warnings display in selected language
+\- \*\*Educational Enhancement\*\* - Better accessibility for Korean-speaking researchers and students
+
+🚀 \*\*Demo Improvements\*\*
+\- \*\*Enhanced Gradio Interface\*\* - Improved user experience with language selector
+\- \*\*HF Spaces Deployment\*\* - Successfully deployed to https://huggingface.co/spaces/Flamehaven/arr-medic-cyp3a4-demo
+\- \*\*Mobile-Friendly Design\*\* - Responsive interface works on all devices
+\- \*\*Pre-loaded Examples\*\* - Quick testing with Ethanol, Caffeine, and Ibuprofen compounds
+
+🔧 \*\*Technical Updates\*\*
+\- \*\*Fixed RDKit Dependencies\*\* - Stable conda-based installation approach
+\- \*\*Improved Docker Configuration\*\* - Updated Dockerfile with optimized conda/pip setup
+\- \*\*Enhanced Requirements\*\* - Compatible gradio~=3.50 with rdkit-pypi integration
+\- \*\*Docker Compose Enhancement\*\* - Added multilingual demo service
+
+\### Changed
+\- \*\*Updated Requirements.txt\*\* - Switched to gradio~=3.50 for better Pydantic v1 compatibility
+\- \*\*Enhanced README.md\*\* - Added comprehensive multilingual feature documentation
+\- \*\*Improved Docker Setup\*\* - Optimized container build process for scientific packages
+
+\### Fixed
+\- \*\*IndentationError Resolution\*\* - Fixed Python syntax issues in deployed app.py
+\- \*\*HF Spaces Compatibility\*\* - Resolved dependency conflicts for stable deployment
+\- \*\*RDKit Integration\*\* - Stable molecular visualization across platforms
+
+\## \[1.0.1] - 2025-09-14
 
 \### Added
 \- Automated installation scripts (`scripts/install.sh`, `scripts/install.bat`)

@@ -240,11 +240,14 @@ Experience the predictor directly in your browser - no installation required!
 
 🚀 **[Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/Flamehaven/arr-medic-cyp3a4-demo)**
 
-Features:
-- Interactive SMILES input with molecular visualization
-- Real-time CYP3A4 inhibition predictions
-- Educational examples and detailed results
-- Mobile-friendly interface
+**🌐 Multilingual Interface Features:**
+- **Korean-English Language Toggle** - Real-time interface switching (한국어 ↔ English)
+- **Localized Results** - Prediction results and molecular descriptors in selected language
+- **Interactive SMILES Input** with molecular visualization
+- **Real-time CYP3A4 inhibition predictions**
+- **Educational examples** with pre-loaded compounds (Ethanol, Caffeine, Ibuprofen)
+- **Mobile-friendly responsive design**
+- **Complete UI translation** - all labels, buttons, and messages support both languages
 
 ### Run in Google Colab
 
