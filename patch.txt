@@ -1,108 +1,231 @@
+공개 전 필수 수정 3가지 (5~10분 컷)
+
+레포 위생: backend/.pytest_cache/ 폴더는 버전관리 제외 대상입니다. 루트 .gitignore에 이미 규칙이 있으니, 이번 커밋에서 폴더만 제거하면 OK.
+
+의존성 메모: RDKit는 pip 대신 conda 권장 주석이 이미 있으나, README “설치” 섹션에 **pip-only 경로(모델 단순/옵션화)**와 conda 경로 둘 다 명시해 주세요.
+
+보안 헤더(선택적 권장→강력 추천): Starlette SecurityMiddleware 한 줄로 기본 헤더(HSTS 등) 추가하면 OSS 공개 시 신뢰도 ↑.
+
+# main.py (앱 생성 직후)
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
+from starlette.middleware import Middleware
+from starlette.middleware import Middleware
+# 이미 CORS 미들웨어는 있으니 아래만 추가
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.gzip import GZipMiddleware
+from starlette.middleware import Middleware
+from starlette.middleware import Middleware
+# 최소 예: 압축 + 신뢰 호스트 + 보안헤더
+app.add_middleware(GZipMiddleware, minimum_size=1024)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost","127.0.0.1","your-domain.com"])
+# (필요시 Starlette SecurityMiddleware 또는 자체 헤더 세팅 추가)
+
+
+주: 위 미들웨어는 선택 사항입니다. 현재 API 성격상 CORS 화이트리스트만으로도 충분하지만, 공개 OSS라면 보안 헤더 기본값은 가산점입니다.
+
+코드별 리뷰 & 제안
+models.py
+
+✅ extra="forbid"로 입력 유효성 향상.
+
+✅ PredictionType/RiskLevel Enum으로 일관성 우수.
+
+제안: BatchPredictionRequest.compounds에 SMILES 최대 길이/공백 제거 보조검증을 추가하면 배치 입력도 단일 입력과 동일 강도로 보호됩니다.
+
+predictor.py
+
+✅ 확률 클램프(floor/ceil) 환경변수화로 수치 안정성 확보.
+
+제안: seed 고정 함수(예: utils/repro.set_seed())를 predictor 초기화 시 선택적으로 호출해 테스트 일관성을 보장.
+
+database.py
+
+✅ WAL/timeout/busy_timeout 적용되어 충돌·지연에 강함.
+
+제안: PRAGMA foreign_keys=ON;를 초기화 시 추가(현 스키마상 FK는 없지만 관례적 안정장치).
+
+제안: get_recent_predictions 반환 필드에 model_version 포함(이미 컬럼 있음) → API 응답의 추적성↑.
+
+main.py
+
+✅ CORS 화이트리스트 환경변수, 전역 예외 핸들러, /docs 노출 등 표준기반.
+
+제안: /predict/batch에 최대 배치 크기(예: 100) 서버 측 가드(모델에 이미 제한 있더라도 이중 보호).
+
+제안: /health에서 DB 간단 ping(예: SELECT 1)을 한 번 실행해 실제 연결성을 체크하면 운영 현장에서 유용.
+
+DevEx/릴리스 개선 (있으면 더 좋아요)
+
+배지 추가: README 상단에 CI, License, PyPI(해당 시) 배지 추가.
+
+SECURITY.md: 취약점 제보 경로(이메일/GH Security) 한 줄 문서.
+
+Releases: v1.0.0 서명 태그 + 릴리스 노트(CHANGELOG 반영).
+
+SBOM: GitHub CodeQL 또는 CycloneDX(선택).
+
+샘플 클라이언트: examples/ 폴더에 curl/python requests 예제 2~3개.
+
+Rate Limit: 오픈 엔드포인트의 남용 방지(리버스 프록시 레벨에서 처리 권장: Nginx/Cloudflare).
+
+공개 “Go/No-Go” 체크리스트
+
+ 테스트/CI 그린 (pytest + Bandit)
+
+ 라이선스/문서/워크플로 준비
+
+ Docker 로컬 실행 성공 (docker build, docker run -p 8000:8000 …)
+
+ .pytest_cache/ 제거 커밋
+
+ (선택) 보안 헤더 미들웨어 추가
+
+ (선택) README에 pip/conda 설치 경로 병기
+
+최종 판단
+
+Go입니다. 위 2~3개 경미한 수정을 커밋한 뒤, v1.0.0 태깅해서 GitHub 공개하세요.
+
+🔹 Patch — OSS 보완
 *** Begin Patch
-*** Add File: CONTRIBUTING.md
-+# Contributing to arr-medic-cyp3a4-opensource
-+
-+## Development Quickstart
-+```bash
-+git clone https://github.com/OWNER/arr-medic-cyp3a4-opensource.git
-+cd arr-medic-cyp3a4-opensource
-+python -m venv .venv && source .venv/bin/activate
-+pip install -e .
-+pip install -r requirements-dev.txt
-+pytest -q
-+```
-+
-+## Commit & Branch
-+- Conventional commits 권장: `feat:`, `fix:`, `docs:`, `chore:`
-+- Branch naming: `feat/<topic>` or `fix/<topic>`
-+
-+## Testing
-+- 모든 새로운 기능은 pytest 기반 단위테스트를 추가해야 합니다.
-+- API endpoint / DB I/O / predictor 동작 커버리지 포함.
-+
-+## Pull Requests
-+- [ ] 테스트 통과
-+- [ ] 커버리지 ≥ 80%
-+- [ ] README / Docs 업데이트
-+
-*** End Patch
-*** Update File: .github/workflows/backend-ci.yml
-@@
-       - name: Run tests
-         run: |
-           pytest -q --maxfail=1 --disable-warnings --cov=.
--      - name: Bandit Security Scan
--        run: bandit -r . || true
-+      - name: Bandit Security Scan
-+        run: bandit -r .
-*** End Patch
-*** Add File: requirements-dev.txt
-+pytest>=8.2
-+pytest-cov>=5.0
-+bandit>=1.7
-+mypy>=1.10
-+black>=24.4
-+isort>=5.13
-*** End Patch
 *** Update File: README.md
 @@
- ## Features
+ # ARR-MEDIC CYP3A4 Opensource
+ 
+-## Features
++## ⚠️ Disclaimer
++
++🔴 **Not for Clinical or Diagnostic Use**  
++This project is intended **only for research and educational purposes**.  
++Do **not** use it in clinical decision-making, patient care, or regulatory submissions.
++
++---
++
++## Features
  - FastAPI backend
  - CYP3A4 predictor (rule-based, extensible)
 +
-+⚠️ **Disclaimer**: This project is for **research and educational purposes only**.  
-+It is **not intended for clinical or diagnostic use**.
++## Roadmap
++- v1.0: Rule-based baseline (~70% accuracy)
++- v2.0: Add RDKit descriptors + ML (RandomForest, XGBoost)
++- v3.0: GNN / Transformer support
 +
-+## Installation
-+```bash
-+git clone https://github.com/OWNER/arr-medic-cyp3a4-opensource.git
-+cd arr-medic-cyp3a4-opensource
-+pip install -r requirements.txt
-+```
++For advanced **clinical-grade Pro version (90%+ accuracy, Flamehaven)**,  
++please see commercial offerings. Migration toolkit (logs/DB transfer) will be provided.
 +
-+## Running (local)
-+```bash
-+uvicorn app.main:app --reload
-+```
++---
 +
-+## Example API call
-+```bash
-+curl -X POST http://127.0.0.1:8000/predict \
-+  -H "Content-Type: application/json" \
-+  -d '{"smiles": "CCO"}'
-+```
++## Example: Run in Google Colab
 +
-+## Contributing
-+See [CONTRIBUTING.md](CONTRIBUTING.md)
-*** End Patch
-*** Update File: predictor.py
-@@
- def predict(smiles: str) -> dict:
--    # Simple rule-based predictor
--    if "N" in smiles:
--        return {"cyp3a4": True, "confidence": 0.7}
--    return {"cyp3a4": False, "confidence": 0.7}
-+    """Predict CYP3A4 substrate likelihood.
++You can try the predictor interactively in a Jupyter/Colab notebook.
 +
-+    Currently rule-based (~70% accuracy).  
-+    Future extension: support ML models (RandomForest, XGBoost, GNN).
-+    """
-+    if "N" in smiles:
-+        return {"cyp3a4": True, "confidence": 0.7, "model": "rule-based"}
-+    return {"cyp3a4": False, "confidence": 0.7, "model": "rule-based"}
-*** End Patch
-*** Add File: tests/test_predictor.py
-+import pytest
++```python
++!pip install arr-medic-cyp3a4-opensource fastapi uvicorn
++
 +from predictor import predict
 +
-+def test_predict_with_nitrogen():
-+    res = predict("CCN")
-+    assert res["cyp3a4"] is True
-+    assert 0 <= res["confidence"] <= 1
++print(predict("CCN"))  # simple demo
++```
 +
-+def test_predict_without_nitrogen():
-+    res = predict("CCO")
-+    assert res["cyp3a4"] is False
-+    assert "model" in res
+*** End of File
+*** Add File: notebooks/demo_colab.ipynb
++{
++ "cells": [
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "# ARR-MEDIC CYP3A4 Opensource — Colab Demo\n",
++    "\n",
++    "🔴 Not for Clinical Use.\n",
++    "\n",
++    "This notebook demonstrates how to use the CYP3A4 rule-based predictor."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "source": [
++    "!pip install arr-medic-cyp3a4-opensource fastapi uvicorn"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "source": [
++    "from predictor import predict\n",
++    "\n",
++    "print(predict(\"CCN\"))\n",
++    "print(predict(\"CCO\"))"
++   ]
++  }
++ ],
++ "metadata": {
++  "kernelspec": {
++   "display_name": "Python 3",
++   "language": "python",
++   "name": "python3"
++  },
++  "language_info": {
++   "name": "python"
++  }
++ },
++ "nbformat": 4,
++ "nbformat_minor": 2
++}
+*** End Patch
+*** Add File: .github/ISSUE_TEMPLATE/bug_report.md
++---
++name: Bug report
++about: Report a bug to help us improve
++title: "[BUG]"
++labels: bug
++assignees: ''
++---
++
++**Describe the bug**
++A clear and concise description of what the bug is.
++
++**To Reproduce**
++Steps to reproduce the behavior:
++1. Run '...'
++2. See error
++
++**Expected behavior**
++A clear and concise description of what you expected to happen.
++
++**Environment**
++- OS: [e.g. Ubuntu 22.04]
++- Python version: [e.g. 3.10]
++
++**Additional context**
++Add any other context about the problem here.
+*** End Patch
+*** Add File: .github/ISSUE_TEMPLATE/feature_request.md
++---
++name: Feature request
++about: Suggest an idea for this project
++title: "[FEAT]"
++labels: enhancement
++assignees: ''
++---
++
++**Is your feature request related to a problem? Please describe.**
++A clear and concise description of what the problem is.
++
++**Describe the solution you'd like**
++A clear and concise description of what you want to happen.
++
++**Additional context**
++Add any other context or screenshots about the feature request here.
 *** End Patch
 *** End Patch
+
+🔹 패치 주요 효과
+
+README.md → 상단에 🔴 Disclaimer + Roadmap + Colab 실행 예시 추가.
+
+notebooks/demo_colab.ipynb → 교육/연구자가 바로 실행 가능한 Jupyter Notebook.
