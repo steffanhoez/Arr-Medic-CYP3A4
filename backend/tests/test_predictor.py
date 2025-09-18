@@ -1,5 +1,5 @@
 import pytest
-from predictor import CYP3A4BasicPredictor
+from backend.predictor import CYP3A4BasicPredictor
 
 @pytest.fixture
 def predictor():

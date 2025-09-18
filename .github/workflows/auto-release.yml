@@ -1,0 +1,104 @@
+name: Auto Release from Tags
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # v1.0.0, v1.1.0 etc.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.1.0)'
+        required: true
+        default: 'v1.1.0'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Extract version from tag or input
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          echo "tag_name=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Extract release notes from CHANGELOG
+      id: changelog
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        VERSION_NO_V="${VERSION#v}"
+
+        # Extract content between version headers from CHANGELOG.md
+        if grep -q "\[$VERSION_NO_V\]" CHANGELOG.md; then
+          # Get content from this version to next version or end of file
+          awk "/## \[$VERSION_NO_V\]/,/^## \[/{
+            if(/^## \[/ && !/## \[$VERSION_NO_V\]/) exit;
+            if(!/^## \[$VERSION_NO_V\]/) print
+          }" CHANGELOG.md > release_notes.txt
+
+          # Clean up the notes
+          sed -i '1{/^$/d}' release_notes.txt  # Remove empty first line
+          sed -i '/^$/N;/^\n$/d' release_notes.txt  # Remove double empty lines
+        else
+          echo "📝 Version $VERSION_NO_V release notes" > release_notes.txt
+          echo "" >> release_notes.txt
+          echo "See [CHANGELOG.md](CHANGELOG.md) for detailed changes." >> release_notes.txt
+        fi
+
+        # Add project links
+        cat >> release_notes.txt << 'EOF'
+
+---
+
+## 🔗 Quick Links
+- 🌐 **[Live Demo](https://huggingface.co/spaces/Flamehaven/arr-medic-cyp3a4-demo)** - Try the multilingual interface
+- 📚 **[Documentation](README.md)** - Complete setup and usage guide
+- 🐛 **[Issues](https://github.com/Flamehaven/Arr-Medic-CYP3A4/issues)** - Report bugs or request features
+- 💬 **[Discussions](https://github.com/Flamehaven/Arr-Medic-CYP3A4/discussions)** - Community support
+
+## 🚀 Installation
+```bash
+git clone https://github.com/Flamehaven/Arr-Medic-CYP3A4.git
+cd Arr-Medic-CYP3A4
+# See README.md for detailed installation instructions
+```
+
+⚠️ **Disclaimer**: Research and educational purposes only. Not for clinical use.
+EOF
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.tag_name }}
+        release_name: 'ARR-MEDIC CYP3A4 ${{ steps.version.outputs.version }}'
+        body_path: release_notes.txt
+        draft: false
+        prerelease: false
+
+    - name: Upload demo assets (optional)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: demo/requirements.txt
+        asset_name: demo-requirements.txt
+        asset_content_type: text/plain
+      continue-on-error: true
+
+    - name: Notify success
+      run: |
+        echo "✅ Release ${{ steps.version.outputs.version }} created successfully!"
+        echo "🔗 View at: https://github.com/Flamehaven/Arr-Medic-CYP3A4/releases"

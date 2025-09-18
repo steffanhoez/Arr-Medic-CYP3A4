@@ -4,14 +4,13 @@ Pydantic Models for ARR-MEDIC CYP3A4 Opensource API
 Data validation and serialization models.
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from enum import Enum
 
 class StrictBase(BaseModel):
-    class Config:
-        extra = "forbid"  # disallow unknown fields
+    model_config = ConfigDict(extra="forbid")  # disallow unknown fields
 
 class PredictionType(str, Enum):
     INHIBITOR = "inhibitor"
@@ -27,7 +26,8 @@ class PredictionRequest(StrictBase):
     smiles: str = Field(..., description="SMILES string of the compound")
     compound_id: Optional[str] = Field(None, description="Optional compound identifier")
     
-    @validator('smiles')
+    @field_validator('smiles')
+    @classmethod
     def validate_smiles(cls, v):
         if not v or len(v.strip()) == 0:
             raise ValueError("SMILES string cannot be empty")
@@ -56,7 +56,8 @@ class BatchPredictionRequest(StrictBase):
         description="List of compounds with 'smiles' and optional 'compound_id'"
     )
     
-    @validator('compounds')
+    @field_validator('compounds')
+    @classmethod
     def validate_compounds(cls, v):
         if not v:
             raise ValueError("Compounds list cannot be empty")

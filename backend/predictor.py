@@ -166,16 +166,20 @@ class CYP3A4BasicPredictor:
     def predict(self, smiles: str, compound_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Main prediction method
-        
+
         Args:
             smiles: SMILES string of compound
             compound_id: Optional compound identifier
-            
+
         Returns:
             Dictionary with prediction results
         """
         start_time = time.time()
-        
+
+        # Validate input
+        if not smiles or not smiles.strip():
+            raise ValueError("SMILES string cannot be empty")
+
         try:
             # Extract molecular descriptors
             descriptors = self._extract_molecular_descriptors(smiles)

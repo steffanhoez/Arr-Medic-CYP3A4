@@ -10,19 +10,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.gzip import GZipMiddleware
+from contextlib import asynccontextmanager
 import uvicorn
 import logging
 from typing import List, Dict, Any
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 
-from models import (
+from .models import (
     PredictionRequest, PredictionResponse, HealthResponse,
     BatchPredictionRequest, BatchPredictionResponse
 )
-from predictor import CYP3A4BasicPredictor
-from database import get_database, Database, close_database
+from .predictor import CYP3A4BasicPredictor
+from .database import get_database, Database, close_database
 
 # Load environment variables
 load_dotenv()
@@ -35,18 +36,46 @@ logger = logging.getLogger(__name__)
 _origins = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
 ALLOWED_ORIGINS = [o.strip() for o in _origins.split(",") if o.strip()] or ["http://localhost:3000"]
 
+# Get allowed hosts from environment
+_allowed_hosts = os.getenv("FASTAPI_ALLOWED_HOSTS", "").strip()
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(",") if h.strip()] or [
+    "localhost",
+    "127.0.0.1",
+    "testserver",  # Allow TestClient requests
+    "your-domain.com",
+]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager"""
+    # Startup
+    logger.info("Starting ARR-MEDIC CYP3A4 Opensource API...")
+    db = await get_database()
+    if not db:
+        logger.error("Database initialization failed")
+        raise RuntimeError("Database initialization failed")
+    logger.info("Application startup complete")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down ARR-MEDIC CYP3A4 Opensource API...")
+    await close_database()
+    logger.info("Application shutdown complete")
+
 # Initialize FastAPI app
 app = FastAPI(
     title="ARR-MEDIC CYP3A4 Opensource",
     description="Basic CYP3A4 Drug Interaction Prediction API",
     version="1.0.0-opensource",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Security middleware
 app.add_middleware(GZipMiddleware, minimum_size=1024)
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "your-domain.com"])
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
 
 # CORS middleware with environment-based origins
 app.add_middleware(
@@ -68,22 +97,7 @@ async def _unhandled(request: Request, exc: Exception):
 # Initialize predictor
 predictor = CYP3A4BasicPredictor()
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize application on startup"""
-    logger.info("Starting ARR-MEDIC CYP3A4 Opensource API...")
-    db = await get_database()
-    if not db:
-        logger.error("Database initialization failed")
-        raise RuntimeError("Database initialization failed")
-    logger.info("Application startup complete")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on application shutdown"""
-    logger.info("Shutting down ARR-MEDIC CYP3A4 Opensource API...")
-    await close_database()
-    logger.info("Application shutdown complete")
+# Lifespan events handled in lifespan context manager above
 
 @app.get("/", response_model=Dict[str, str])
 async def root():
@@ -106,7 +120,7 @@ async def health_check():
         
         return HealthResponse(
             status="healthy",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             version="1.0.0-opensource",
             components={
                 "database": db_status,
@@ -118,7 +132,7 @@ async def health_check():
         logger.error(f"Health check failed: {e}")
         return HealthResponse(
             status="unhealthy",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             version="1.0.0-opensource",
             components={
                 "database": "unknown",
@@ -163,7 +177,7 @@ async def predict_cyp3a4(
             confidence=result["confidence"],
             probability=result["probability"],
             risk_level=result["risk_level"],
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             model_version="basic-v1.0",
             processing_time=result.get("processing_time", 0.0),
             molecular_descriptors=result.get("descriptors", {}),
@@ -188,7 +202,7 @@ async def predict_batch(
     """Batch prediction endpoint for multiple compounds"""
     try:
         logger.info(f"Processing batch of {len(payload.compounds)} compounds")
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         results = []
         successful = 0
         failed = 0
@@ -222,7 +236,7 @@ async def predict_batch(
                     probability=result["probability"],
                     confidence=result["confidence"],
                     risk_level=result["risk_level"],
-                    timestamp=datetime.utcnow(),
+                    timestamp=datetime.now(timezone.utc),
                     model_version="basic-v1.0",
                     processing_time=result.get("processing_time", 0.0),
                     molecular_descriptors=result.get("descriptors", {}),
@@ -237,7 +251,7 @@ async def predict_batch(
                 failed += 1
                 continue
 
-        processing_time = (datetime.utcnow() - start_time).total_seconds()
+        processing_time = (datetime.now(timezone.utc) - start_time).total_seconds()
 
         batch_response = BatchPredictionResponse(
             results=results,
